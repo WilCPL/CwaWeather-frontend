@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="zonai-weather">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>左納烏氣象碑文</title>
+  <link rel="icon" type="image/png" href="./icon-v2.png" />
+  <link rel="apple-touch-icon" href="./icon-v2.png" />
+  <style>
+    @font-face {
+      font-family: "ZeldaFont";
+      src: url("https://fonts.cdnfonts.com/s/20736/HyliaSerifBeta-Regular.otf") format("opentype");
+    }
+
+    :root {
+      --zn-bg-deep: #050e0c;
+      --zn-bg-top: #0f2923;
+      --zn-glow: #71f5ae;
+      --zn-glow-soft: rgba(113, 245, 174, 0.35);
+      --zn-stone: #3b5a4d;
+      --zn-text-main: #e7f7eb;
+      --zn-text-sub: #9bd3b5;
+      --zn-card: rgba(7, 24, 20, 0.92);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: "ZeldaFont", "Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--zn-text-main);
+      background:
+        radial-gradient(circle at 0% 0%, rgba(113, 245, 174, 0.12), transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(113, 245, 174, 0.1), transparent 50%),
+        linear-gradient(180deg, var(--zn-bg-top) 0%, var(--zn-bg-deep) 55%, #020606 100%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .overlay {
+      min-height: 100vh;
+      padding: 20px 18px 28px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .overlay::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(135deg, rgba(113, 245, 174, 0.06) 0, rgba(113, 245, 174, 0.06) 1px, transparent 1px, transparent 5px),
+        radial-gradient(circle at 15% 85%, rgba(3, 180, 120, 0.45), transparent 55%);
+      opacity: 0.7;
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 2.1rem;
+      letter-spacing: 0.35em;
+      padding-top: 8px;
+      margin-bottom: 22px;
+      text-indent: 0.35em;
+      color: var(--zn-text-main);
+      text-shadow:
+        0 0 6px var(--zn-glow-soft),
+        0 0 18px rgba(0, 0, 0, 0.85);
+      position: relative;
+    }
+
+    .title::after {
+      content: "⟡";
+      display: block;
+      margin: 6px auto 0;
+      font-size: 1.2rem;
+      color: var(--zn-glow);
+      text-shadow: 0 0 12px var(--zn-glow);
+    }
+
+    .hero-card {
+      background: var(--zn-card);
+      border-radius: 22px;
+      max-width: 560px;
+      margin: 0 auto 26px;
+      padding: 22px 20px 18px;
+      border: 1.5px solid rgba(113, 245, 174, 0.55);
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.9),
+        0 0 24px var(--zn-glow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before,
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 245, 174, 0.35);
+      opacity: 0.7;
+      inset: 10px;
+      pointer-events: none;
+    }
+
+    .hero-card::after {
+      inset: 16px;
+      border-style: dashed;
+      border-color: rgba(113, 245, 174, 0.25);
+      filter: blur(0.2px);
+    }
+
+    .hero-ring {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 2px solid rgba(113, 245, 174, 0.45);
+      top: -40px;
+      right: -40px;
+      box-shadow: 0 0 26px rgba(113, 245, 174, 0.6);
+      opacity: 0.4;
+      animation: ring-spin 16s linear infinite;
+    }
+
+    .hero-ring::after {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(113, 245, 174, 0.45);
+    }
+
+    @keyframes ring-spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+      color: var(--zn-text-sub);
+    }
+
+    .hero-label {
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(113, 245, 174, 0.7);
+      background: radial-gradient(circle at 0% 0%, rgba(113, 245, 174, 0.42), rgba(5, 14, 12, 0.9));
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      text-indent: 0.18em;
+    }
+
+    .hero-location {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .hero-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .hero-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .weather-icon {
+      font-size: 3.4rem;
+      text-shadow:
+        0 0 10px rgba(0, 0, 0, 0.7),
+        0 0 14px rgba(113, 245, 174, 0.4);
+      transform-origin: center bottom;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .temp-main {
+      font-size: 3.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .temp-main span {
+      font-size: 1.3rem;
+      opacity: 0.7;
+      margin-left: 3px;
+    }
+
+    .hero-right {
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--zn-text-sub);
+    }
+
+    .hero-right-line {
+      opacity: 0.9;
+    }
+
+    .hero-right-sub {
+      font-size: 0.78rem;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .desc {
+      font-size: 1.1rem;
+      margin-top: 14px;
+      color: var(--zn-text-main);
+    }
+
+    .advice-box {
+      border-top: 1px solid rgba(155, 211, 181, 0.45);
+      margin-top: 14px;
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .advice-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 8px 6px;
+      border-radius: 14px;
+      background: radial-gradient(circle at 0% 0%, rgba(113, 245, 174, 0.18), rgba(3, 17, 14, 0.9));
+      border: 1px solid rgba(113, 245, 174, 0.4);
+    }
+
+    .advice-item-icon {
+      font-size: 1.8rem;
+    }
+
+    .advice-item-main {
+      color: var(--zn-text-main);
+      text-align: center;
+      line-height: 1.35;
+      letter-spacing: 0.08em;
+    }
+
+    .advice-item-sub {
+      font-size: 0.7rem;
+      color: var(--zn-text-sub);
+      opacity: 0.85;
+    }
+
+    .section-title {
+      max-width: 560px;
+      margin: 0 auto 10px;
+      font-size: 0.95rem;
+      letter-spacing: 0.2em;
+      text-indent: 0.2em;
+      color: var(--zn-text-sub);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before,
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(113, 245, 174, 0.6));
+    }
+
+    .section-title::after {
+      background: linear-gradient(90deg, rgba(113, 245, 174, 0.6), transparent);
+    }
+
+    .scroll {
+      max-width: 560px;
+      margin: 0 auto;
+      display: flex;
+      overflow-x: auto;
+      gap: 14px;
+      padding: 4px 2px 10px;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mini-card {
+      min-width: 130px;
+      background: rgba(5, 19, 16, 0.96);
+      border-radius: 14px;
+      padding: 10px 10px 9px;
+      border: 1px solid rgba(113, 245, 174, 0.4);
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.85);
+      text-align: center;
+      font-size: 0.85rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mini-card::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      border: 1px dashed rgba(113, 245, 174, 0.2);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .mini-time {
+      margin-bottom: 4px;
+      color: var(--zn-text-sub);
+      letter-spacing: 0.12em;
+      text-indent: 0.12em;
+    }
+
+    .mini-icon {
+      font-size: 1.9rem;
+      margin: 3px 0;
+    }
+
+    .mini-temp {
+      font-size: 0.9rem;
+      color: var(--zn-text-main);
+    }
+
+    .mini-rain {
+      margin-top: 2px;
+      font-size: 0.72rem;
+      color: var(--zn-text-sub);
+      opacity: 0.9;
+    }
+
+    @media (max-width: 420px) {
+      .hero-main {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .hero-right {
+        align-self: flex-end;
+        text-align: right;
+      }
+
+      .temp-main {
+        font-size: 3.2rem;
+      }
+    }
+
+    .mineru-art {
+      position: fixed;
+      right: 5vw;
+      bottom: -4vh;
+      height: 88vh;
+      opacity: 0.9;
+      pointer-events: none;
+      filter: drop-shadow(0 0 22px var(--zn-glow-soft));
+      user-select: none;
+      animation: mineruFloat 7s ease-in-out infinite;
+      z-index: 0;
+    }
+
+    @keyframes mineruFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="title">左納烏 氣象碑文</div>
+
+    <div id="heroCard" class="hero-card">
+      <div class="hero-ring"></div>
+    </div>
+
+    <div class="section-title">將至之風 的 軌跡</div>
+    <div id="futureForecasts" class="scroll"></div>
+    <div class="zonai-bot zonai-bot-right"></div>
+  </div>
+
+  <script>
+    const API_URL = "https://weather-taitaipeipei.zeabur.app/api/weather/kaohsiung";
+
+    function getWeatherIcon(w) {
+      if (!w) return "☀️";
+      if (w.includes("晴")) return "☀️";
+      if (w.includes("多雲")) return "🌤️";
+      if (w.includes("陰")) return "☁️";
+      if (w.includes("雨")) return "🌧️";
+      if (w.includes("雷")) return "⛈️";
+      return "☀️";
+    }
+
+    function safeTemp(v) {
+      if (v === undefined || v === null) return null;
+      const num = parseFloat(String(v).replace(/[^\d.-]/g, ""));
+      return isNaN(num) ? null : num;
+    }
+
+    function getAdvice(rain, max) {
+      const r = Number(rain) || 0;
+      const tRaw = safeTemp(max);
+      const t = tRaw ?? 0;
+
+      const rainIcon = r > 30 ? "☂️" : "🌀";
+      const rainTxt = r > 30 ? "綠渦濃聚・傘為護符" : "氣流穩定・無須護符";
+
+      let clothIcon = "🧥";
+      let clothTxt = "高地寒流・添上披肩";
+
+      if (t >= 28) {
+        clothIcon = "🎽";
+        clothTxt = "遺跡微熱・輕裝即可";
+      } else if (t >= 20) {
+        clothIcon = "👕";
+        clothTxt = "風脈溫順・常服合宜";
+      }
+
+      return { rainIcon, rainTxt, clothIcon, clothTxt };
+    }
+
+    function periodLabel(t) {
+      const h = new Date(t).getHours();
+      if (h >= 5 && h < 11) return "晨之層";
+      if (h >= 11 && h < 14) return "日頂層";
+      if (h >= 14 && h < 18) return "斜陽層";
+      if (h >= 18 && h < 23) return "夜行層";
+      return "靜寂層";
+    }
+
+    function render(data) {
+      const f = data.forecasts;
+      if (!Array.isArray(f) || !f.length) return;
+
+      const cur = f[0];
+      const max = safeTemp(cur.maxTemp);
+      const min = safeTemp(cur.minTemp);
+      const avg = max !== null && min !== null
+        ? Math.round((max + min) / 2)
+        : (max ?? min ?? 0);
+
+      const adv = getAdvice(cur.rain, cur.maxTemp);
+
+      const now = new Date();
+      const month = now.getMonth() + 1;
+      const date = now.getDate();
+
+      document.getElementById("heroCard").innerHTML = `
+        <div class="hero-ring"></div>
+        <div class="hero-header">
+          <div class="hero-label">風 脈 讀 取 完 成</div>
+          <div class="hero-location">海拉魯南境 · ${month} / ${date}</div>
+        </div>
+        <div class="hero-main">
+          <div class="hero-left">
+            <div class="weather-icon">${getWeatherIcon(cur.weather)}</div>
+            <div class="temp-main">${avg}<span>°Z</span></div>
+          </div>
+          <div class="hero-right">
+            <div class="hero-right-line">高層：${cur.maxTemp}</div>
+            <div class="hero-right-line">低層：${cur.minTemp}</div>
+            <div class="hero-right-sub">降雨徵兆：${cur.rain}</div>
+          </div>
+        </div>
+        <div class="desc">${cur.weather} ・ 氣象碑文已更新</div>
+        <div class="advice-box">
+          <div class="advice-item">
+            <div class="advice-item-icon">${adv.rainIcon}</div>
+            <div class="advice-item-main">${adv.rainTxt}</div>
+            <div class="advice-item-sub">降雨機率 ${cur.rain}</div>
+          </div>
+          <div class="advice-item">
+            <div class="advice-item-icon">${adv.clothIcon}</div>
+            <div class="advice-item-main">${adv.clothTxt}</div>
+            <div class="advice-item-sub">體感以最高溫 ${cur.maxTemp}</div>
+          </div>
+        </div>
+      `;
+
+      const wrap = document.getElementById("futureForecasts");
+      wrap.innerHTML = "";
+
+      const today = new Date().getDate();
+
+      f.slice(1).forEach((x) => {
+        let label = periodLabel(x.startTime);
+        const d = new Date(x.startTime).getDate();
+        if (d !== today) label = "明日環 · " + label;
+
+        const maxF = safeTemp(x.maxTemp);
+        const minF = safeTemp(x.minTemp);
+
+        wrap.innerHTML += `
+          <div class="mini-card">
+            <div class="mini-time">${label}</div>
+            <div class="mini-icon">${getWeatherIcon(x.weather)}</div>
+            <div class="mini-temp">${minF ?? "?"}° - ${maxF ?? "?"}°</div>
+            <div class="mini-rain">風脈含水量 ${x.rain}</div>
+          </div>
+        `;
+      });
+    }
+
+    async function start() {
+      try {
+        const r = await fetch(API_URL).then((r) => r.json());
+        if (r.success) render(r.data);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    start();
+  </script>
+
+  <img class="mineru-art" src="img/ToK_Mineru.webp" alt="Mineru" />
+</body>
+</html>
